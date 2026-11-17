@@ -5,7 +5,7 @@ renaming it or remembering its terminal ID. Intended for Windows and macOS.
 
 ## Status: initial implementation
 
-Working: machine-scoped reference formatting, grouped agent list (Needs you,
+Working: right-click Copy Reference in the desktop sidebar, machine-scoped reference formatting, grouped agent list (Needs you,
 Done, Working, Idle), Copy and Open actions, and an installer that preserves
 shipped mods. **Dragging an agent into a terminal draft is not implemented.**
 Current installed Herdr mod APIs expose file dragging, but not text payloads.
@@ -17,15 +17,20 @@ misrepresent a file attachment or automatic command execution as a text drag.
 Requires Python 3, Herdr, and hc on PATH:
 
 ```sh
-python scripts/install.py
+python scripts/install.py --sidebar
 herdr-app do mod.open --name agent-reference
 ```
 
 On Windows use `py -3 scripts/install.py`. If commands are not on PATH, pass
 `--herdr /path/to/herdr-app` and `--hc /path/to/hc`. Installation writes only
-`~/.config/herdr-app/mods/agent-reference`, leaving the current layout intact.
+`~/.config/herdr-app/mods/agent-reference`. With `--sidebar`, it also creates a
+user-owned clone of the active agents mod and layout, adds a right-click
+"Copy Reference" action (label: ????), and activates that clone. Existing status
+bar customizations are preserved. The original layout and shipped mods remain intact.
+Switch back to the previous layout to undo sidebar integration.
 A same-named unmanaged mod is never overwritten. Reinstall after machine routes
-change. Windows and macOS use the same mod; macOS live UI validation is pending.
+change. Windows and macOS use the same mod; Windows and macOS mod checks pass; Windows rendering has been inspected.
+Clipboard behavior from actual right-click interaction still needs UI acceptance.
 
 Copy places a JSON reference on the clipboard. Paste it into the receiving
 agent's input, review it, and submit yourself. The reference includes the source

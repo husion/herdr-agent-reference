@@ -1,6 +1,6 @@
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { agents, theme, run } from "herdr";
+import { agents, theme, run, props, closeOverlay, openOverlay } from "herdr";
 import { SOURCE_HOST, MACHINE_HOSTS } from "./config.js";
 import { grouped, makeReference, referenceText } from "./reference.js";
 const labels = { blocked: "Needs you", done: "Done", working: "Working", idle: "Idle" };
@@ -8,13 +8,20 @@ export default class AgentReferences extends View {
   init() { this.copied = null; }
   render() {
     const t = theme();
+    const target = props()?.referenceTarget;
+    if (target) return v_flex().p(5).bg(t.popover).child(div().id("copy-agent-reference").px(10).py(8).rounded(5)
+      .text_color(t.foreground).hover(el => el.bg(t.hover)).cursor_pointer()
+      .on_click((_e, cx) => {
+        cx.write_to_clipboard(referenceText(makeReference(target, SOURCE_HOST, MACHINE_HOSTS)));
+        closeOverlay(props().overlay);
+      }).child("复制引用"));
     return v_flex().w_full().h(420).min_h(0).p(10).gap(8).bg(t.surface)
       .child(div().text_size(15).text_color(t.foreground).child("Agent references"))
       .child(div().text_size(11).text_color(t.dim).child("Copy a reference, then paste it into your draft. Native text dragging awaits a Herdr API."))
       .child(v_flex().flex_1().min_h(0).overflow_y_scrollbar().gap(10)
         .children(grouped(agents()).filter(g => g.agents.length).map(g => v_flex().gap(4)
           .child(div().text_size(12).text_color(t[g.status] ?? t.dim).child(`${labels[g.status]} ${g.agents.length}`))
-          .children(g.agents.map(a => h_flex().id(`agent-ref-${a.address}`).gap(6).items_center().p(6).rounded(6).bg(t.raised)
+          .children(g.agents.map(a => h_flex().id(`agent-ref-${a.address}`).on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "agent-reference", kind: "popup", width: 140, props: { referenceTarget: a } }); }).gap(6).items_center().p(6).rounded(6).bg(t.raised)
             .child(v_flex().flex_1().min_w(0)
               .child(div().text_size(12).text_color(t.foreground).child(a.title || a.tab_name || a.address))
               .child(div().text_size(10).text_color(t.dim).child(`${a.space_name} / ${a.address}`)))
