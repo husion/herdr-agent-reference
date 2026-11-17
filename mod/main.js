@@ -8,7 +8,7 @@ export default class AgentReferences extends View {
   init() { this.copied = null; }
   render() {
     const t = theme();
-    return v_flex().w_full().min_h(0).p(10).gap(8).bg(t.surface)
+    return v_flex().w_full().h(420).min_h(0).p(10).gap(8).bg(t.surface)
       .child(div().text_size(15).text_color(t.foreground).child("Agent references"))
       .child(div().text_size(11).text_color(t.dim).child("Copy a reference, then paste it into your draft. Native text dragging awaits a Herdr API."))
       .child(v_flex().flex_1().min_h(0).overflow_y_scrollbar().gap(10)
