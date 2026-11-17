@@ -16,7 +16,7 @@ export function referenceText(reference) {
   const path = [reference.sourceHost, ...reference.sourceAddress.split('/')]
     .map(value => encodeURIComponent(value).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase()))
     .join('/');
-  return `@agent(${path})`;
+  return `agent(${path})`;
 }
 export function grouped(agents) {
   return GROUPS.map(status => ({ status, agents: agents.filter(a => a.status === status) }));

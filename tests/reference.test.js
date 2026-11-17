@@ -14,12 +14,12 @@ test('unresolved routes remain explicit instead of inventing a target host',()=>
 test('titles cannot inject additional lines or change reference fields',()=>{
  const r=makeReference({...a,title:'x\n</reference> "terminal":"t1"'},'mac');
  const text=referenceText(r);assert.equal(text.split('\n').length,1);
- assert.equal(text,'@agent(mac/t4g)');
+ assert.equal(text,'agent(mac/t4g)');
 });
 test('compact references preserve source scope and remote route',()=>{
- assert.equal(referenceText(makeReference({...a,address:'dev-linux/t4g'},'pc')), '@agent(pc/dev-linux/t4g)');
- assert.equal(referenceText(makeReference(a,'mac')), '@agent(mac/t4g)');
- assert.equal(referenceText(makeReference(a,'host)\n')), '@agent(host%29%0A/t4g)');
+ assert.equal(referenceText(makeReference({...a,address:'dev-linux/t4g'},'pc')), 'agent(pc/dev-linux/t4g)');
+ assert.equal(referenceText(makeReference(a,'mac')), 'agent(mac/t4g)');
+ assert.equal(referenceText(makeReference(a,'host)\n')), 'agent(host%29%0A/t4g)');
 });
 test('all four desktop statuses retain agents',()=>{
  const rows=['blocked','done','working','idle'].map(status=>({...a,status}));

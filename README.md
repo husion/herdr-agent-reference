@@ -35,9 +35,9 @@ Clipboard behavior from actual right-click interaction still needs UI acceptance
 Copy places a compact reference on the clipboard:
 
 ```text
-@agent(macbook/t4g)
-@agent(desktop/mac/t4g)
-@agent(desktop/dev-linux/t2)
+agent(macbook/t4g)
+agent(desktop/mac/t4g)
+agent(desktop/dev-linux/t2)
 ```
 
 The first segment identifies the source Core host. Remaining segments are the
