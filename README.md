@@ -5,7 +5,7 @@ renaming it or remembering its terminal ID. Intended for Windows and macOS.
 
 ## Status: initial implementation
 
-Working: right-click Copy Reference in the desktop sidebar, machine-scoped reference formatting, grouped agent list (Needs you,
+Working: right-click Copy Reference in the desktop sidebar, source-aware send/reply reference formatting, grouped agent list (Needs you,
 Done, Working, Idle), Copy and Open actions, and an installer that preserves
 shipped mods. **Dragging an agent into a terminal draft is not implemented.**
 Current installed Herdr mod APIs expose file dragging, but not text payloads.
@@ -28,32 +28,50 @@ user-owned clone of the active agents mod and layout, adds a right-click
 "Copy ref" action, and activates that clone. Existing status
 bar customizations are preserved. The original layout and shipped mods remain intact.
 Switch back to the previous layout to undo sidebar integration.
-A same-named unmanaged mod is never overwritten. Reinstall after machine routes
-change. Windows and macOS use the same mod; Windows and macOS mod checks pass; Windows rendering has been inspected.
+A same-named unmanaged mod is never overwritten. Copy rereads live machine routes. Windows and macOS use the same mod; Windows and macOS mod checks pass; Windows rendering has been inspected.
 Clipboard behavior from actual right-click interaction still needs UI acceptance.
 
-Copy places a compact reference on the clipboard:
+Copy now reads the current Core's registered machines and each connected machine's
+registration table. The currently focused agent is the sender; the row being copied
+is the target. It puts a stable target identity and two source-relative commands on
+the clipboard:
 
 ```text
-agent(macbook/t4g)
-agent(desktop/mac/t4g)
-agent(desktop/dev-linux/t2)
+agent(<target-core-id>/t2)
+Send from current agent: hc send mac/wsl/t2 "<message>"
+Reply from target: hc send pc/dev/t30 "<report>"
 ```
 
-The first segment identifies the source Core host. Remaining segments are the
-address **as seen by that source Core**; `desktop/mac/t4g` means resolve `mac/t4g`
-from `desktop`, not from the receiving machine. This is a human/agent-readable
-project convention, not a built-in Herdr mention or executable command. Hostnames
-are descriptive rather than authenticated global IDs. Resolve against live Core
-metadata before dispatch. Segments use percent encoding for special characters.
-Titles, space names and program metadata are deliberately omitted.
+The routes use local aliases at each hop, calculated independently in each direction.
+Nodes are deduplicated by Core ID, including hosts whose Windows and WSL hostname
+is identical. Cycles terminate. Missing tables, offline connections or a missing
+focused agent produce an explicit error, not an invented return route. Nothing is
+sent, executed at the target agent, or pasted into its draft automatically. Registration
+metadata is read when copying; no periodic routing announcements or new permissions
+are created. A copied reference is a snapshot: copy again after topology changes.
 
-Paste into the receiving agent's draft, review, and submit yourself. Nothing is
-automatically sent. The context menu uses the same 12.8px text and 31px row height
-as Herdr's space context menu. Both the context action and panel button say Copy ref.
+## Explicit transit connections
 
-This mod sends no data over the network. Installation generates a machine-local
-config file; never commit that file.
+`scripts/bridge.py` is a byte-transparent SSH adapter for `hc machine add --via`.
+It runs an explicitly supplied argv on an existing SSH host and forwards stdin/stdout
+without a shell timeout or output buffering. It never discovers or registers a machine
+on its own. Check the target Core ID before adding; reuse existing IDs rather than
+adding duplicate aliases. Do not infer reverse authorization from a forward connection.
+
+For a Windows SSH hop it uses the existing `py -3` on that host to preserve the exact
+native argv; PowerShell 5 otherwise corrupts quoted shell probes. For a Unix hop it
+quotes the remote argv with POSIX rules. It uses existing SSH credentials, BatchMode
+and a connection timeout, with no agent forwarding or copied credentials.
+
+Registering an explicit transit connection lets the existing desktop and mobile clients
+load that Core's real layout, events and terminals. It does not extend Core's `on`
+syntax or recursively aggregate terminal lists. Newly added network nodes require an
+explicit registration; this is not automatic topology discovery. Installation paths and
+machine-specific transport arguments remain outside this repository.
+
+Paste into the receiving agent's draft, review, and submit yourself. The native
+right-click action and panel button remain Copy ref. Native text dragging remains
+unimplemented.
 
 ## Development
 
