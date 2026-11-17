@@ -9,12 +9,12 @@ export default class AgentReferences extends View {
   render() {
     const t = theme();
     const target = props()?.referenceTarget;
-    if (target) return v_flex().p(5).bg(t.popover).child(div().id("copy-agent-reference").px(10).py(8).rounded(5)
+    if (target) return v_flex().p(5).bg(t.popover).text_size(12.8).child(div().id("copy-agent-reference").px(8).h(31).flex().items_center().rounded(7)
       .text_color(t.foreground).hover(el => el.bg(t.hover)).cursor_pointer()
       .on_click((_e, cx) => {
         cx.write_to_clipboard(referenceText(makeReference(target, SOURCE_HOST, MACHINE_HOSTS)));
         closeOverlay(props().overlay);
-      }).child("复制引用"));
+      }).child("Copy ref"));
     return v_flex().w_full().h(420).min_h(0).p(10).gap(8).bg(t.surface)
       .child(div().text_size(15).text_color(t.foreground).child("Agent references"))
       .child(div().text_size(11).text_color(t.dim).child("Copy a reference, then paste it into your draft. Native text dragging awaits a Herdr API."))
@@ -30,7 +30,7 @@ export default class AgentReferences extends View {
               .on_click((_e, cx) => {
                 cx.write_to_clipboard(referenceText(makeReference(a, SOURCE_HOST, MACHINE_HOSTS)));
                 this.copied = a.address; cx.notify();
-              }).child(this.copied === a.address ? "Copied" : "Copy"))
+              }).child(this.copied === a.address ? "Copied" : "Copy ref"))
             .child(div().id(`open-ref-${a.address}`).px(6).py(4).cursor_pointer().text_color(t.dim)
               .on_click(() => run("agent.focus", { terminal: a.address })).child("Open")))))));
   }

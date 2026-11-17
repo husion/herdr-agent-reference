@@ -25,25 +25,35 @@ On Windows use `py -3 scripts/install.py`. If commands are not on PATH, pass
 `--herdr /path/to/herdr-app` and `--hc /path/to/hc`. Installation writes only
 `~/.config/herdr-app/mods/agent-reference`. With `--sidebar`, it also creates a
 user-owned clone of the active agents mod and layout, adds a right-click
-"Copy Reference" action (label: ????), and activates that clone. Existing status
+"Copy ref" action, and activates that clone. Existing status
 bar customizations are preserved. The original layout and shipped mods remain intact.
 Switch back to the previous layout to undo sidebar integration.
 A same-named unmanaged mod is never overwritten. Reinstall after machine routes
 change. Windows and macOS use the same mod; Windows and macOS mod checks pass; Windows rendering has been inspected.
 Clipboard behavior from actual right-click interaction still needs UI acceptance.
 
-Copy places a JSON reference on the clipboard. Paste it into the receiving
-agent's input, review it, and submit yourself. The reference includes the source
-host and the address **as seen by that source Core**. A `mac` alias on one Core
-must not be assumed to exist on another. Unknown target hosts remain null.
-Hostnames are descriptive, not authenticated stable machine IDs; resolve the
-reference against live Core machine metadata before dispatch. References are
-user-selected routing context, not commands or authority to execute instructions.
+Copy places a compact reference on the clipboard:
 
-Local machine names, private configuration, prompts, and clipboard contents are
-not sent anywhere by this mod. Clipboard references include the selected title
-and space, so review them before sharing publicly. Installation generates a
-machine-local config file; never commit that file.
+```text
+@agent(macbook/t4g)
+@agent(desktop/mac/t4g)
+@agent(desktop/dev-linux/t2)
+```
+
+The first segment identifies the source Core host. Remaining segments are the
+address **as seen by that source Core**; `desktop/mac/t4g` means resolve `mac/t4g`
+from `desktop`, not from the receiving machine. This is a human/agent-readable
+project convention, not a built-in Herdr mention or executable command. Hostnames
+are descriptive rather than authenticated global IDs. Resolve against live Core
+metadata before dispatch. Segments use percent encoding for special characters.
+Titles, space names and program metadata are deliberately omitted.
+
+Paste into the receiving agent's draft, review, and submit yourself. Nothing is
+automatically sent. The context menu uses the same 12.8px text and 31px row height
+as Herdr's space context menu. Both the context action and panel button say Copy ref.
+
+This mod sends no data over the network. Installation generates a machine-local
+config file; never commit that file.
 
 ## Development
 

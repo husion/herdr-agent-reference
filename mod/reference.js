@@ -11,8 +11,12 @@ export function makeReference(agent, sourceHost, machineHosts = {}) {
     agent: agent.program?.name ?? agent.app ?? '' };
 }
 export function referenceText(reference) {
-  // JSON quoting keeps titles from injecting lines, XML markup, or shell commands.
-  return 'Herdr agent reference (resolve sourceHost/sourceAddress before routing): ' + JSON.stringify(reference);
+  // Keep the source Core scope: aliases and bare terminal IDs are not global.
+  // Titles, space names and program names are unnecessary for addressing.
+  const path = [reference.sourceHost, ...reference.sourceAddress.split('/')]
+    .map(value => encodeURIComponent(value).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase()))
+    .join('/');
+  return `@agent(${path})`;
 }
 export function grouped(agents) {
   return GROUPS.map(status => ({ status, agents: agents.filter(a => a.status === status) }));
